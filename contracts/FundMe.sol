@@ -13,12 +13,12 @@ contract FundMe {
     address[] public funders;
 
     // Could we make this constant?  /* hint: no! We should make it immutable! */
-    address public /* immutable */ i_owner;
-    uint256 public constant MINIMUM_USD = 50 * 10 ** 18;
-    
+    address public immutable i_owner;
+    uint256 public constant MINIMUM_USD = 50 * 10**18;
+
     AggregatorV3Interface public priceFeed;
 
-    modifier onlyOwner {
+    modifier onlyOwner() {
         // require(msg.sender == owner);
         if (msg.sender != i_owner) revert FundMe__NotOwner();
         _;
@@ -30,14 +30,21 @@ contract FundMe {
     }
 
     function fund() public payable {
-        require(msg.value.getConversionRate(priceFeed) >= MINIMUM_USD, "You need to spend more ETH!");
+        require(
+            msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
+            "You need to spend more ETH!"
+        );
         // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, "You need to spend more ETH!");
         addressToAmountFunded[msg.sender] += msg.value;
         funders.push(msg.sender);
     }
-    
-    function withdraw() payable onlyOwner public {
-        for (uint256 funderIndex=0; funderIndex < funders.length; funderIndex++){
+
+    function withdraw() public payable onlyOwner {
+        for (
+            uint256 funderIndex = 0;
+            funderIndex < funders.length;
+            funderIndex++
+        ) {
             address funder = funders[funderIndex];
             addressToAmountFunded[funder] = 0;
         }
@@ -48,18 +55,20 @@ contract FundMe {
         // bool sendSuccess = payable(msg.sender).send(address(this).balance);
         // require(sendSuccess, "Send failed");
         // call
-        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
+        (bool callSuccess, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
         require(callSuccess, "Call failed");
     }
-    
+
     // Explainer from: https://solidity-by-example.org/fallback/
     // Ether is sent to contract
     //      is msg.data empty?
-    //          /   \ 
+    //          /   \
     //         yes  no
     //         /     \
-    //    receive()?  fallback() 
-    //     /   \ 
+    //    receive()?  fallback()
+    //     /   \
     //   yes   no
     //  /        \
     //receive()  fallback()
@@ -71,5 +80,4 @@ contract FundMe {
     receive() external payable {
         fund();
     }
-
 }

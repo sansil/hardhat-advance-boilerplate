@@ -11,26 +11,23 @@ const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY
 module.exports = {
   //solidity: '0.8.8',
   solidity: {
-    compilers: [
-      { version: "0.8.8" },
-      { version: "0.6.6" }
-    ]
+    compilers: [{ version: '0.8.8' }, { version: '0.6.6' }],
   },
-  defaultNetwork: "hardhat",
+  defaultNetwork: 'hardhat',
   networks: {
     rinkeby: {
       url: RINKEBY_RPC_URL,
       accounts: [PRIVATE_KEY],
       chainId: 4,
-      blockConfirmations: 6
-    }
+      blockConfirmations: 6,
+    },
   },
   gasReporter: {
-    enabled: false,
+    enabled: true,
     outputFile: 'gas-report.txt',
     noColors: true,
     currency: 'USD',
-    coinmarketcap: COINMARKETCAP_API_KEY,
+    //coinmarketcap: COINMARKETCAP_API_KEY,
     token: 'MATIC',
   },
   etherscan: {
@@ -38,11 +35,10 @@ module.exports = {
   },
   namedAccounts: {
     deployer: {
-      default: 0
+      default: 0,
     },
     user: {
       default: 1,
-
-    }
-  }
+    },
+  },
 }
